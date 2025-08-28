@@ -23,16 +23,21 @@ export default function ProductoCard({ producto }) {
 
   return (
     <div className="card">
-      {producto.imagen && (
+      {/* Imagen del producto */}
+      {producto.imagen_url && (
         <img
-          src={producto.imagen}  // ✅ La API ya devuelve URL completa
+          src={producto.imagen_url} // URL completa proporcionada por el serializer
           alt={producto.nombre}
           className="producto-img"
         />
       )}
+
+      {/* Datos del producto */}
       <h3>{producto.nombre}</h3>
       <p>{producto.descripcion}</p>
       <p className="price">${producto.precio}</p>
+
+      {/* Botón para agregar al carrito */}
       <button onClick={onAdd}>Agregar al carrito</button>
     </div>
   );
