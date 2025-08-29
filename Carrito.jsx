@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+  import { useEffect } from "react";
 import { useCarrito } from "../context/CarritoContext";
 import { useAuth } from "../context/AuthContext";
 import { crearPedido } from "../api/api";
@@ -19,7 +19,6 @@ export default function Carrito() {
 
   useEffect(() => {
     cargarCarrito();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const total = items.reduce(
