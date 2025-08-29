@@ -33,27 +33,30 @@ export function CarritoProvider({ children }) {
 
   useEffect(() => {
     cargarCarrito();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [access]);
 
-  // Actualización local inmediata + sincronización con API
+  // Actualización local inmediata + sincronización con backend
   const actualizarCantidad = async (producto_id, delta) => {
     if (!access) throw new Error("Debes iniciar sesión.");
 
-    setCarrito(prev => ({
-      ...prev,
-      items: prev.items.map(it =>
-        it.producto.id === producto_id
-          ? { ...it, cantidad: it.cantidad + delta, subtotal: (it.cantidad + delta) * it.producto.precio }
-          : it
-      )
-    }));
+    let cantidadFinal = 0;
+
+    setCarrito(prev => {
+      const newItems = prev.items.map(it => {
+        if (it.producto.id !== producto_id) return it;
+        const nuevaCantidad = it.cantidad + delta;
+        if (nuevaCantidad < 1) return it;
+        cantidadFinal = nuevaCantidad; // guardamos cantidad real
+        return { ...it, cantidad: nuevaCantidad, subtotal: nuevaCantidad * it.producto.precio };
+      });
+      return { ...prev, items: newItems };
+    });
 
     try {
-      await apiAgregar(producto_id, delta, access);
+      await apiSetCantidad(producto_id, cantidadFinal, access);
     } catch (e) {
       console.error(e);
-      await cargarCarrito(); // opcional: recargar si falla
+      await cargarCarrito(); // opcional: recarga si falla
     }
   };
 
