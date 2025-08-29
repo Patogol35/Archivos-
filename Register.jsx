@@ -14,10 +14,18 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Función para determinar fortaleza de la contraseña
+  const passwordStrength = (pwd) => {
+    if (pwd.length < 6) return { label: "Muy corta", color: "red", width: "20%" };
+    if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/.test(pwd))
+      return { label: "Fuerte", color: "green", width: "100%" };
+    if (/^(?=.*[a-z])(?=.*\d).{6,}$/.test(pwd)) return { label: "Media", color: "orange", width: "60%" };
+    return { label: "Débil", color: "red", width: "40%" };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Validaciones frontend
     if (!form.username.trim()) {
       toast.error("El usuario es obligatorio");
       return;
@@ -59,6 +67,8 @@ export default function Register() {
     }
   };
 
+  const strength = passwordStrength(form.password);
+
   return (
     <form onSubmit={handleSubmit} className="form-container">
       <h2>Registro</h2>
@@ -81,6 +91,21 @@ export default function Register() {
         onChange={(e) => setForm({ ...form, password: e.target.value })}
         required
       />
+      {form.password && (
+        <div className="strength-bar-container">
+          <div
+            className="strength-bar"
+            style={{
+              width: strength.width,
+              backgroundColor: strength.color,
+              transition: "width 0.3s ease",
+              height: "8px",
+              borderRadius: "4px",
+            }}
+          ></div>
+          <small style={{ color: strength.color }}>{strength.label}</small>
+        </div>
+      )}
       <input
         type="password"
         placeholder="Confirmar contraseña"
