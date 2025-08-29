@@ -2,6 +2,7 @@ import { useState } from "react";
 import { register as apiRegister } from "../api/api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../App.css";
 
 export default function Register() {
@@ -14,13 +15,19 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Función para determinar fortaleza de la contraseña
+  // Calcula la fuerza de la contraseña
   const passwordStrength = (pwd) => {
-    if (pwd.length < 6) return { label: "Muy corta", color: "red" };
-    if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/.test(pwd))
-      return { label: "Fuerte", color: "green" };
-    if (/^(?=.*[a-z])(?=.*\d).{6,}$/.test(pwd)) return { label: "Media", color: "orange" };
-    return { label: "Débil", color: "red" };
+    let score = 0;
+    if (pwd.length >= 6) score++;
+    if (pwd.length >= 10) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+    if (score <= 2) return { label: "Débil", color: "red", width: "40%" };
+    if (score === 3) return { label: "Media", color: "orange", width: "60%" };
+    if (score === 4) return { label: "Fuerte", color: "green", width: "80%" };
+    if (score >= 5) return { label: "Muy fuerte", color: "darkgreen", width: "100%" };
   };
 
   const handleSubmit = async (e) => {
@@ -72,18 +79,21 @@ export default function Register() {
   return (
     <form onSubmit={handleSubmit} className="form-container">
       <h2>Registro</h2>
+
       <input
         placeholder="Usuario"
         value={form.username}
         onChange={(e) => setForm({ ...form, username: e.target.value })}
         required
       />
+
       <input
         type="email"
         placeholder="Correo (opcional)"
         value={form.email}
         onChange={(e) => setForm({ ...form, email: e.target.value })}
       />
+
       <input
         type="password"
         placeholder="Contraseña"
@@ -91,11 +101,25 @@ export default function Register() {
         onChange={(e) => setForm({ ...form, password: e.target.value })}
         required
       />
+
       {form.password && (
-        <p style={{ color: strength.color }}>
-          Fortaleza: {strength.label}
-        </p>
+        <div className="strength-bar-container" style={{ marginBottom: "8px" }}>
+          <div
+            className="strength-bar"
+            style={{
+              width: strength.width,
+              backgroundColor: strength.color,
+              transition: "width 0.3s ease",
+              height: "8px",
+              borderRadius: "4px",
+            }}
+          ></div>
+          <small style={{ color: strength.color, fontWeight: "bold" }}>
+            {strength.label}
+          </small>
+        </div>
       )}
+
       <input
         type="password"
         placeholder="Confirmar contraseña"
@@ -103,6 +127,7 @@ export default function Register() {
         onChange={(e) => setForm({ ...form, confirm: e.target.value })}
         required
       />
+
       <button type="submit" disabled={loading}>
         {loading ? "Creando cuenta..." : "Registrarse"}
       </button>
