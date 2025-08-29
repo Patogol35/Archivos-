@@ -14,6 +14,7 @@ export function CarritoProvider({ children }) {
   const [carrito, setCarrito] = useState({ items: [] });
   const [loading, setLoading] = useState(false);
 
+  // Cargar carrito desde API
   const cargarCarrito = async () => {
     if (!access) {
       setCarrito({ items: [] });
@@ -36,38 +37,46 @@ export function CarritoProvider({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [access]);
 
-  // Actualizar cantidad absoluta
+  // Actualizar cantidad usando la API y recargar
+  const actualizarCantidad = async (producto_id, delta) => {
+    if (!access) throw new Error("Debes iniciar sesión.");
+    try {
+      await apiAgregar(producto_id, delta, access); // delta puede ser +1 o -1
+      await cargarCarrito(); // recarga desde backend, garantiza valor exacto
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const setCantidad = async (itemId, cantidad) => {
     if (!access) throw new Error("Debes iniciar sesión.");
     if (cantidad < 1) return;
-
-    // Actualizamos localmente
-    setCarrito(prev => ({
-      ...prev,
-      items: prev.items.map(it =>
-        it.id === itemId
-          ? { ...it, cantidad, subtotal: cantidad * it.producto.precio }
-          : it
-      )
-    }));
-
-    // Sincronizamos con la API
-    await apiSetCantidad(itemId, cantidad, access);
+    try {
+      await apiSetCantidad(itemId, cantidad, access);
+      await cargarCarrito(); // recarga desde backend
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const agregarAlCarrito = async (producto_id, cantidad = 1) => {
     if (!access) throw new Error("Debes iniciar sesión.");
-    await apiAgregar(producto_id, cantidad, access);
-    await cargarCarrito();
+    try {
+      await apiAgregar(producto_id, cantidad, access);
+      await cargarCarrito();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const eliminarItem = async (itemId) => {
     if (!access) throw new Error("Debes iniciar sesión.");
-    setCarrito(prev => ({
-      ...prev,
-      items: prev.items.filter(it => it.id !== itemId)
-    }));
-    await apiEliminar(itemId, access);
+    try {
+      await apiEliminar(itemId, access);
+      await cargarCarrito();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const limpiarLocal = () => setCarrito({ items: [] });
@@ -80,6 +89,7 @@ export function CarritoProvider({ children }) {
         loading,
         cargarCarrito,
         agregarAlCarrito,
+        actualizarCantidad,
         setCantidad,
         eliminarItem,
         limpiarLocal,
