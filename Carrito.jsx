@@ -1,3 +1,17 @@
+
+<img
+  src={producto.imagen_url}
+  alt={producto.nombre}
+  style={{
+    width: '100%',
+    maxWidth: '250px',
+    height: '200px',
+    objectFit: 'cover',
+    borderRadius: '12px',
+    marginBottom: '12px'
+  }
+
+
 import { useEffect } from "react";
 import { useCarrito } from "../context/CarritoContext";
 import { useAuth } from "../context/AuthContext";
