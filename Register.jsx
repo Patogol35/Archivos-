@@ -16,11 +16,11 @@ export default function Register() {
 
   // Función para determinar fortaleza de la contraseña
   const passwordStrength = (pwd) => {
-    if (pwd.length < 6) return { label: "Muy corta", color: "red", width: "20%" };
+    if (pwd.length < 6) return { label: "Muy corta", color: "red" };
     if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/.test(pwd))
-      return { label: "Fuerte", color: "green", width: "100%" };
-    if (/^(?=.*[a-z])(?=.*\d).{6,}$/.test(pwd)) return { label: "Media", color: "orange", width: "60%" };
-    return { label: "Débil", color: "red", width: "40%" };
+      return { label: "Fuerte", color: "green" };
+    if (/^(?=.*[a-z])(?=.*\d).{6,}$/.test(pwd)) return { label: "Media", color: "orange" };
+    return { label: "Débil", color: "red" };
   };
 
   const handleSubmit = async (e) => {
@@ -92,19 +92,9 @@ export default function Register() {
         required
       />
       {form.password && (
-        <div className="strength-bar-container">
-          <div
-            className="strength-bar"
-            style={{
-              width: strength.width,
-              backgroundColor: strength.color,
-              transition: "width 0.3s ease",
-              height: "8px",
-              borderRadius: "4px",
-            }}
-          ></div>
-          <small style={{ color: strength.color }}>{strength.label}</small>
-        </div>
+        <p style={{ color: strength.color }}>
+          Fortaleza: {strength.label}
+        </p>
       )}
       <input
         type="password"
