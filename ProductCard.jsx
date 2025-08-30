@@ -1,77 +1,42 @@
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useCarrito } from "../context/CarritoContext";
-import { toast } from "react-toastify";
-// MUI
-import {
-  Card,
-  CardMedia,
-  CardContent,
-  CardActions,
-  Typography,
-  Button,
-} from "@mui/material";
+import React from "react";
+import { Card, CardContent, CardMedia, Typography, Button } from "@mui/material";
 
-export default function ProductoCard({ producto }) {
-  const { isAuthenticated } = useAuth();
-  const { agregarAlCarrito } = useCarrito();
-  const navigate = useNavigate();
-
-  const onAdd = async () => {
-    if (!isAuthenticated) {
-      toast.warn("Debes iniciar sesión para agregar productos 🛒");
-      navigate("/login");
-      return;
-    }
-    try {
-      await agregarAlCarrito(producto.id, 1);
-      toast.success(`"${producto.nombre}" agregado al carrito ✅`);
-    } catch (e) {
-      toast.error(e.message);
-    }
-  };
-
+function ProductoCard({ producto, agregarAlCarrito }) {
   return (
     <Card
       sx={{
-        maxWidth: 300,
         borderRadius: 3,
-        boxShadow: 3,
-        m: 2,
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+        "&:hover": {
+          transform: "translateY(-5px)",
+          boxShadow: "0px 8px 24px rgba(0,0,0,0.15)",
+        },
       }}
     >
-      {producto.imagen_url && (
-        <CardMedia
-          component="img"
-          height="200"
-          image={producto.imagen_url}
-          alt={producto.nombre}
-          sx={{ objectFit: "cover" }}
-        />
-      )}
-
+      <CardMedia
+        component="img"
+        height="200"
+        image={producto.imagen}
+        alt={producto.nombre}
+        sx={{ objectFit: "cover" }}
+      />
       <CardContent>
-        <Typography variant="h6" gutterBottom>
-          {producto.nombre}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" paragraph>
-          {producto.descripcion}
-        </Typography>
-        <Typography variant="h6" color="primary">
+        <Typography variant="h6" gutterBottom>{producto.nombre}</Typography>
+        <Typography variant="body2" color="text.secondary">{producto.descripcion}</Typography>
+        <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
           ${producto.precio}
         </Typography>
-      </CardContent>
-
-      <CardActions>
         <Button
           variant="contained"
-          color="primary"
           fullWidth
-          onClick={onAdd}
+          sx={{ mt: 2, bgcolor: "secondary.main", "&:hover": { bgcolor: "secondary.dark" } }}
+          onClick={() => agregarAlCarrito(producto)}
         >
           Agregar al carrito
         </Button>
-      </CardActions>
+      </CardContent>
     </Card>
   );
 }
+
+export default ProductoCard;
