@@ -1,85 +1,33 @@
-import { useState } from "react";
-import { login as apiLogin } from "../api/api";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-// MUI
-import {
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Box,
-  CircularProgress,
-} from "@mui/material";
+import React, { useState } from "react";
+import { Box, Paper, TextField, Button, Typography, Avatar } from "@mui/material";
+import { LockOutlined } from "@mui/icons-material";
 
-export default function Login() {
-  const [form, setForm] = useState({ username: "", password: "" });
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
+function Login() {
+  const [form, setForm] = useState({ email: "", password: "" });
 
-  const handleSubmit = async (e) => {
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      const data = await apiLogin(form);
-      if (data?.access && data?.refresh) {
-        login(data.access, data.refresh);
-        toast.success("Bienvenido 👋");
-        navigate("/");
-      } else {
-        toast.error("Credenciales inválidas");
-      }
-    } catch (e) {
-      toast.error(e.message);
-    } finally {
-      setLoading(false);
-    }
+    console.log("Login:", form);
   };
 
   return (
-    <Container maxWidth="xs" sx={{ mt: 8 }}>
-      <Paper
-        elevation={3}
-        sx={{ p: 4, borderRadius: 2, display: "flex", flexDirection: "column", gap: 2 }}
-      >
-        <Typography variant="h5" align="center" gutterBottom>
-          Iniciar sesión
-        </Typography>
-
+    <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+      <Paper elevation={6} sx={{ p: 4, width: 350, borderRadius: 3 }}>
+        <Avatar sx={{ bgcolor: "primary.main", mx: "auto", mb: 2 }}>
+          <LockOutlined />
+        </Avatar>
+        <Typography variant="h5" align="center" gutterBottom>Iniciar sesión</Typography>
         <form onSubmit={handleSubmit}>
-          <TextField
-            label="Usuario"
-            fullWidth
-            margin="normal"
-            value={form.username}
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
-          />
-          <TextField
-            label="Contraseña"
-            type="password"
-            fullWidth
-            margin="normal"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-          />
-
-          <Box mt={2}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              disabled={loading}
-              startIcon={loading && <CircularProgress size={20} color="inherit" />}
-            >
-              {loading ? "Entrando..." : "Iniciar sesión"}
-            </Button>
-          </Box>
+          <TextField label="Email" name="email" type="email" fullWidth margin="normal" onChange={handleChange} />
+          <TextField label="Contraseña" name="password" type="password" fullWidth margin="normal" onChange={handleChange} />
+          <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+            Entrar
+          </Button>
         </form>
       </Paper>
-    </Container>
+    </Box>
   );
 }
+
+export default Login;
