@@ -19,7 +19,7 @@ function Navbar() {
           to="/"
           sx={{ flexGrow: 1, textDecoration: "none", color: "inherit", fontWeight: 600 }}
         >
-          🛍️ Mi Tienda
+          🛍️ Mi Tienda Desarrollado por Jorge Patricio Santamaría Cherrez
         </Typography>
         <Box>
           <Button color="inherit" component={Link} to="/carrito" startIcon={<ShoppingCart />}>
